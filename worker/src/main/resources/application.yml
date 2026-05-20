@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: ocee-worker
+  profiles:
+    active: ${OCEE_WORKER_PROFILE:docker}
+  data:
+    redis:
+      url: ${OCEE_REDIS_URL:redis://localhost:6379}
+
+sandbox:
+  concurrency: 0
+  output-cap-bytes: 65536
+  tmpfs-bytes: 67108864
+  reaper-interval: 60s
+  reaper-max-age: 60s
+  docker:
+    socket: unix:///var/run/docker.sock
+
+ocee:
+  streams:
+    jobs: ocee.jobs
+    results: ocee.results
+    dead-letter: ocee.jobs.dead
+    consumer-group: ocee-workers
+  worker:
+    visibility-timeout-seconds: 30
+    reclaim-interval-ms: 10000
+    max-deliveries: 3
+    mock-min-ms: 50
+    mock-max-ms: 200
+
+server:
+  port: 8090
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: ocee-api
+  datasource:
+    url: ${OCEE_DB_URL:jdbc:postgresql://localhost:5432/ocee}
+    username: ${OCEE_DB_USER:ocee}
+    password: ${OCEE_DB_PASSWORD:ocee}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      url: ${OCEE_REDIS_URL:redis://localhost:6379}
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+
+ocee:
+  pagination:
+    default-limit: 50
+    max-limit: 200
+  streams:
+    jobs: ocee.jobs
+    results: ocee.results
+    dead-letter: ocee.jobs.dead
+    consumer-group: ocee-api
+  outbox:
+    poll-interval-ms: 200
+    max-attempts: 5
+    batch-size: 50
+  wait:
+    max-timeout-seconds: 10
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

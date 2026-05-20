@@ -1,0 +1,3 @@
+ALTER TABLE language ADD COLUMN image            VARCHAR(255)     NOT NULL DEFAULT '';
+ALTER TABLE language ADD COLUMN compile_cpu_time DOUBLE PRECISION NOT NULL DEFAULT 10.0;
+ALTER TABLE language ADD COLUMN compile_memory   INT              NOT NULL DEFAULT 524288;

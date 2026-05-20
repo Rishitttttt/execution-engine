@@ -1,0 +1,38 @@
+target/
+  *.jar
+  *.war
+  *.class
+
+  # IntelliJ / JetBrains
+  .idea/
+  *.iml
+  *.iws
+  *.ipr
+  out/
+
+  # Eclipse
+  .project
+  .classpath
+  .settings/
+  bin/
+
+  # VS Code
+  .vscode/
+
+  # OS
+  .DS_Store
+  Thumbs.db
+
+  # Logs
+  *.log
+  logs/
+
+  # Env / secrets
+  .env
+  .env.*
+  !.env.example
+  *.pem
+  *.key
+
+  # Local Docker / test scratch
+  *.local.yml
