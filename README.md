@@ -1,8 +1,72 @@
 # OCEE — Online Code Execution Engine
 
+## Demo
+
+[![Watch the demo](https://cdn.loom.com/sessions/thumbnails/25e76c15b07a410283c46ba8e6ae518b-with-play.gif)](https://www.loom.com/share/25e76c15b07a410283c46ba8e6ae518b)
+
+---
+
 Multi-language code-judge service: submit source code via REST, run it in a hardened Docker sandbox, get back stdout/stderr, exit code, and real CPU/memory metrics. Judge0-inspired contract, but not drop-in compatible.
 
 Supported languages: **Python 3.11, C (gcc 13), C++ (g++ 13), Java 21, Node 20**.
+
+## How it works
+
+```
+                         ┌─────────────────────────────────────────────┐
+                         │               OCEE Platform                  │
+                         │                                              │
+  ┌────────┐  POST       │  ┌──────────────────────────────────────┐   │
+  │ Client │────────────▶│  │           API  (Spring Boot)         │   │
+  │        │◀────────────│  │                                      │   │
+  └────────┘  token +    │  │  • REST endpoints (/api/submissions) │   │
+              result      │  │  • Idempotency (key + body hash)    │   │
+                         │  │  • Webhook delivery w/ retry         │   │
+                         │  │  • ?wait=true long-poll support      │   │
+                         │  └───────────┬──────────────────────────┘   │
+                         │              │                               │
+                         │     ┌────────▼────────┐                     │
+                         │     │   PostgreSQL     │                     │
+                         │     │                 │                     │
+                         │     │ • submissions   │                     │
+                         │     │ • outbox        │                     │
+                         │     │ • webhooks      │                     │
+                         │     └─────────────────┘                     │
+                         │                                              │
+                         │     ┌─────────────────┐                     │
+                         │     │      Redis       │                     │
+                         │     │                 │                     │
+                         │     │ ocee.jobs   ───────────────────────┐  │
+                         │     │ ocee.results◀──────────────────┐   │  │
+                         │     └─────────────────┘              │   │  │
+                         │                                       │   │  │
+                         │  ┌────────────────────────────────────│───▼─┐│
+                         │  │        Worker  (Spring Boot)       │   │ ││
+                         │  │                                    ▼   │ ││
+                         │  │  pulls job ──▶ spawn sandbox ──▶ result ││
+                         │  └────────────────────────────────────────┘│
+                         │                                              │
+                         │  ┌─────────────────────────────────────┐    │
+                         │  │        Sandbox Containers            │    │
+                         │  │                                      │    │
+                         │  │  ┌─────────┐ ┌──────┐ ┌────────┐   │    │
+                         │  │  │ Python  │ │  C/  │ │  Java  │   │    │
+                         │  │  │  3.11   │ │ C++  │ │   21   │   │    │
+                         │  │  └─────────┘ └──────┘ └────────┘   │    │
+                         │  │  ┌─────────┐                        │    │
+                         │  │  │  Node   │  read-only fs          │    │
+                         │  │  │   20    │  network=none          │    │
+                         │  │  └─────────┘  non-root UID 1000     │    │
+                         │  └─────────────────────────────────────┘    │
+                         └─────────────────────────────────────────────┘
+```
+
+**Execution flow:**
+1. Client POSTs source code + language → API writes to Postgres outbox + publishes to `ocee.jobs`
+2. Worker picks job from Redis stream → compiles (if needed) + runs in isolated container
+3. Container has no network, read-only rootfs, CPU/memory/pid limits enforced
+4. Worker publishes result to `ocee.results` → API updates submission row
+5. Client polls token or receives webhook callback
 
 ## Architecture
 
@@ -133,3 +197,6 @@ sandbox-images/      One Dockerfile per language
 
 Complete: language catalog, async submission, real sandbox execution with CPU/memory metrics, idempotency, webhooks with retry + dead-letter, multi-language WA comparison, full `docker compose` stack.
 
+---
+
+Built by Rishit

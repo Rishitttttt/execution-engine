@@ -5,9 +5,8 @@ COPY . .
 RUN mvn -B -pl worker -am -DskipTests package
 
 FROM eclipse-temurin:21-jre-alpine
-ARG DOCKER_GID=999
 RUN addgroup -S app \
- && addgroup -S -g ${DOCKER_GID} docker \
+ && addgroup -S docker \
  && adduser  -S -G app app \
  && addgroup app docker
 USER app
