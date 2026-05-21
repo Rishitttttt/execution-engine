@@ -1,57 +1,6 @@
 # OCEE — Online Code Execution Engine
 
-```
-                         ┌─────────────────────────────────────────────┐
-                         │               OCEE Platform                  │
-                         │                                              │
-  ┌────────┐  POST       │  ┌──────────────────────────────────────┐   │
-  │ Client │────────────▶│  │           API  (Spring Boot)         │   │
-  │        │◀────────────│  │                                      │   │
-  └────────┘  token +    │  │  • REST endpoints (/api/submissions) │   │
-              result      │  │  • Idempotency (key + body hash)    │   │
-                         │  │  • Webhook delivery w/ retry         │   │
-                         │  │  • ?wait=true long-poll support      │   │
-                         │  └───────────┬──────────────────────────┘   │
-                         │              │                               │
-                         │     ┌────────▼────────┐                     │
-                         │     │   PostgreSQL     │                     │
-                         │     │                 │                     │
-                         │     │ • submissions   │                     │
-                         │     │ • outbox        │                     │
-                         │     │ • webhooks      │                     │
-                         │     └─────────────────┘                     │
-                         │                                              │
-                         │     ┌─────────────────┐                     │
-                         │     │      Redis       │                     │
-                         │     │                 │                     │
-                         │     │ ocee.jobs   ───────────────────────┐  │
-                         │     │ ocee.results◀──────────────────┐   │  │
-                         │     └─────────────────┘              │   │  │
-                         │                                       │   │  │
-                         │  ┌────────────────────────────────────│───▼─┐│
-                         │  │        Worker  (Spring Boot)       │   │ ││
-                         │  │                                    ▼   │ ││
-                         │  │  pulls job ──▶ spawn sandbox ──▶ result ││
-                         │  └────────────────────────────────────────┘│
-                         │                                              │
-                         │  ┌─────────────────────────────────────┐    │
-                         │  │        Sandbox Containers            │    │
-                         │  │                                      │    │
-                         │  │  ┌─────────┐ ┌──────┐ ┌────────┐   │    │
-                         │  │  │ Python  │ │  C/  │ │  Java  │   │    │
-                         │  │  │  3.11   │ │ C++  │ │   21   │   │    │
-                         │  │  └─────────┘ └──────┘ └────────┘   │    │
-                         │  │  ┌─────────┐                        │    │
-                         │  │  │  Node   │  read-only fs          │    │
-                         │  │  │   20    │  network=none          │    │
-                         │  │  └─────────┘  non-root UID 1000     │    │
-                         │  └─────────────────────────────────────┘    │
-                         └─────────────────────────────────────────────┘
-```
-
-[Watch the demo](https://www.loom.com/share/25e76c15b07a410283c46ba8e6ae518b)
-
----
+Video Demonstration -> [Watch here](https://www.loom.com/share/25e76c15b07a410283c46ba8e6ae518b)
 
 Multi-language code-judge service: submit source code via REST, run it in a hardened Docker sandbox, get back stdout/stderr, exit code, and real CPU/memory metrics. Judge0-inspired contract, but not drop-in compatible.
 
