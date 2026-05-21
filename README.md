@@ -1,11 +1,5 @@
 # OCEE — Online Code Execution Engine
 
-## Demo
-
-[![Watch the demo](https://cdn.loom.com/sessions/thumbnails/25e76c15b07a410283c46ba8e6ae518b-with-play.gif)](https://www.loom.com/share/25e76c15b07a410283c46ba8e6ae518b)
-
----
-
 Multi-language code-judge service: submit source code via REST, run it in a hardened Docker sandbox, get back stdout/stderr, exit code, and real CPU/memory metrics. Judge0-inspired contract, but not drop-in compatible.
 
 Supported languages: **Python 3.11, C (gcc 13), C++ (g++ 13), Java 21, Node 20**.
@@ -67,6 +61,8 @@ Supported languages: **Python 3.11, C (gcc 13), C++ (g++ 13), Java 21, Node 20**
 3. Container has no network, read-only rootfs, CPU/memory/pid limits enforced
 4. Worker publishes result to `ocee.results` → API updates submission row
 5. Client polls token or receives webhook callback
+
+[Watch the demo](https://www.loom.com/share/25e76c15b07a410283c46ba8e6ae518b)
 
 ## Architecture
 
